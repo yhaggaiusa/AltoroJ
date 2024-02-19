@@ -1,3 +1,4 @@
+<%@ page import="org.springframework.web.util.HtmlUtils" %>
 <%@page import="com.ibm.security.appscan.altoromutual.model.Transaction"%>
 <%@page import="com.ibm.security.appscan.altoromutual.util.DBUtil"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
@@ -54,7 +55,7 @@ IBM AltoroJ
 		<!-- To modify account information do not connect to SQL source directly.  Make all changes
 		through the admin page. -->
 		
-		<h1>Account History - <%=accountName%></h1>
+		<h1>Account History - <%=HtmlUtils.htmlEscape(HtmlUtils.htmlUnescape(accountName))%></h1>
 		
 		<table width="590" border="0">
 		  <tr>
