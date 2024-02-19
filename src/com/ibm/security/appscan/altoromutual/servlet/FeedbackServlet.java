@@ -54,6 +54,13 @@ public class FeedbackServlet extends HttpServlet {
 			String comments = request.getParameter("comments");
 			//store feedback in the DB - display their feedback once submitted
 
+			// CSRF token validation
+			String csrfToken = (String) request.getSession().getAttribute("csrf_token");
+			if (csrfToken == null || !csrfToken.equals(request.getParameter("csrf_token"))) {
+				response.sendRedirect("index.jsp");
+				return;
+			}
+
 			String feedbackId = OperationsUtil.sendFeedback(name, email, subject, comments);
 			if (feedbackId != null) {
 				request.setAttribute("feedback_id", feedbackId);
