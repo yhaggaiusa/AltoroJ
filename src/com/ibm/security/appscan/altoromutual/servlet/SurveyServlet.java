@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Servlet implementation class SurveyServlet
@@ -78,7 +79,7 @@ public class SurveyServlet extends HttpServlet {
 		}
 		else if (step.equals("done")){
 			content = "<h1>Thanks</h1>"+
-			"<div width=\"99%\"><p>Thanks for your entry.  We will contact you shortly at:<br /><br /> <b>" + request.getParameter("txtEmail") + "</b></p></div>";
+			"<div width=\"99%\"><p>Thanks for your entry.  We will contact you shortly at:<br /><br /> <b>" + HtmlUtils.htmlEscape(HtmlUtils.htmlUnescape(String.valueOf(request.getParameter("txtEmail")))) + "</b></p></div>";
 			previousStep="email";
 		}
 		else {
