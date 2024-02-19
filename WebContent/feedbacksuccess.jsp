@@ -1,3 +1,4 @@
+<%@ page import="org.springframework.web.util.HtmlUtils" %>
 <%@page import="com.ibm.security.appscan.altoromutual.model.Feedback"%>
 <%@page import="java.util.HashMap"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
@@ -39,7 +40,7 @@ IBM AltoroJ
 		
 		 <h1>Thank You</h1>
 		 
-		 <p>Thank you for your comments<%= (request.getAttribute("message_feedback")!=null)?", "+request.getAttribute("message_feedback"):"" %>.  They will be reviewed by our Customer Service staff and given the full attention that they deserve. 
+		 <p>Thank you for your comments<%= HtmlUtils.htmlEscape(HtmlUtils.htmlUnescape((request.getAttribute("message_feedback")!=null)?", "+request.getAttribute("message_feedback"):"")) %>.  They will be reviewed by our Customer Service staff and given the full attention that they deserve. 
 		 <% String email = (String) request.getParameter("email_addr"); 
 		 	boolean regExMatch = email!=null && email.matches(ServletUtil.EMAIL_REGEXP);
 		 	if (email != null && email.trim().length() != 0 && regExMatch) {%> 
