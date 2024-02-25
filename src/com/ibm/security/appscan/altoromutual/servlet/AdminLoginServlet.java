@@ -18,6 +18,9 @@ IBM AltoroJ
 package com.ibm.security.appscan.altoromutual.servlet;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -26,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ibm.security.appscan.altoromutual.util.ServletUtil;
+import com.ibm.security.appscan.altoromutual.util.DBUtil;
 
 /**
  * Administrator login servlet
@@ -42,14 +46,21 @@ public class AdminLoginServlet extends HttpServlet {
 		if (password == null){
 			response.sendRedirect(request.getContextPath()+"/admin/login.jsp");
 			return ;
-		} else if (!password.equals("Altoro1234")){
-			request.setAttribute("loginError", "Login failed.");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/login.jsp");
-			dispatcher.forward(request, response);
-			return;
 		} else {
-			request.getSession(true).setAttribute(ServletUtil.SESSION_ATTR_ADMIN_KEY, ServletUtil.SESSION_ATTR_ADMIN_VALUE);
-			response.sendRedirect(request.getContextPath()+"/admin/admin.jsp");
+			try {
+				Connection conn = DBUtil.getConnection();
+				String sql = "SELECT * FROM users WHERE password = ?";
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, password);
+				pstmt.executeQuery();
+				request.getSession(true).setAttribute(ServletUtil.SESSION_ATTR_ADMIN_KEY, ServletUtil.SESSION_ATTR_ADMIN_VALUE);
+				response.sendRedirect(request.getContextPath()+"/admin/admin.jsp");
+			} catch (SQLException e) {
+				request.setAttribute("loginError", "Login failed.");
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/login.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
 		}
 	}
 }
