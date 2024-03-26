@@ -68,12 +68,15 @@ public class LoginAPI{
 
 		try {
 			myJson.put("success", username + " is now logged in");
-			
+
 			//Generate a very basic auth token      			
 			String authToken = Base64.encodeBase64String(username.getBytes()) +":"+ Base64.encodeBase64String(password.getBytes()) +":"+OperationsUtil.makeRandomString();
 			
 			myJson.put("Authorization",Base64.encodeBase64String(authToken.getBytes()));
-			return Response.status(Response.Status.OK).entity(myJson.toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
+
+			// Prevent XSS attack by encoding the JSON string
+			String encodedJson = OperationsUtil.encodeJsonString(myJson.toString());
+			return Response.status(Response.Status.OK).entity(encodedJson).type(MediaType.APPLICATION_JSON_TYPE).build();
 		} catch (Exception ex) {
 			myJson.put("failed", "Unexpected error occured. Please try again.");
 			myJson.put("error", ex.getLocalizedMessage());
