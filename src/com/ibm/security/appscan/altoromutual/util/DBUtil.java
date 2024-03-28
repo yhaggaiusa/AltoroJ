@@ -18,6 +18,7 @@ IBM AltoroJ
 
 package com.ibm.security.appscan.altoromutual.util;
 
+import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -272,8 +273,13 @@ public class DBUtil {
 			return null; 
 		
 		Connection connection = getConnection();
-		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_ID, ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE USERID = '"+ username +"' "); /* BAD - user input should always be sanitized */
+		PreparedStatement statement = connection.prepareStatement("SELECT ACCOUNT_ID, ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE USERID = '?' ");
+		try {
+		    statement.setInt(1, Math.round(Float.parseFloat(username)));
+		} catch (NumberFormatException e) {
+		    e.printStackTrace();
+		}
+		ResultSet resultSet =statement.executeQuery(); /* BAD - user input should always be sanitized */
 
 		ArrayList<Account> accounts = new ArrayList<Account>(3);
 		while (resultSet.next()){
