@@ -18,6 +18,7 @@ IBM AltoroJ
 
 package com.ibm.security.appscan.altoromutual.util;
 
+import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -375,7 +376,7 @@ public class DBUtil {
 			Connection connection = getConnection();
 
 			
-			Statement statement = connection.createStatement();
+			PreparedStatement statement = connection.prepareStatement(query);
 			
 			if (rowCount > 0)
 				statement.setMaxRows(rowCount);
@@ -396,11 +397,20 @@ public class DBUtil {
 				dateString = "DATE < '" + endDate + " 23:59:59'";
 			}
 			
-			String query = "SELECT * FROM TRANSACTIONS WHERE (" + acctIds.toString() + ") " + ((dateString==null)?"": "AND (" + dateString + ") ") + "ORDER BY DATE DESC" ;
+			String query = "SELECT * FROM TRANSACTIONS WHERE (" + acctIds.toString() + ") ?ORDER BY DATE DESC" ;
 			ResultSet resultSet = null;
 			
 			try {
-				resultSet = statement.executeQuery(query);
+				try {
+				    statement.setInt(1, Math.round(Float.parseFloat(((dateString==null)?"": "AND (" + dateString + ") "))));
+				} catch (NumberFormatException e) {
+				    // MOBB: consider printing this message to logger: mobb-01c955458906957bb440af432d53fa05: Failed to convert input to type integer
+
+				    // MOBB: using a default value for the SQL parameter in case the input is not convertible.
+				    // This is important for preventing users from causing a denial of service to this application by throwing an exception here.
+				    statement.setInt(1, 0);
+				}
+				resultSet = statement.executeQuery();
 			} catch (SQLException e){
 				int errorCode = e.getErrorCode();
 				if (errorCode == 30000)
